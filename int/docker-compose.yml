@@ -1,0 +1,57 @@
+version: '3.9'
+#**************************************************************
+# integration level test agents                                *
+#***************************************************************
+
+services:
+  #*************************************************************
+  # agent: acapy agent loaded with plugin                      *
+  # for testing                                                *
+  #*************************************************************
+
+  agent:
+    build:
+      context: ../
+      dockerfile: ./int/Dockerfile
+    environment:
+      ACAPY_TOOLBOX_LOG_LEVEL: DEBUG
+    ports:
+      - "3001:3001"
+    command: >
+      start --arg-file int-testing-default.yml
+
+
+  echo:
+    image: dbluhm/echo-agent:6c22a88
+    ports:
+      - "3002:3002"
+    command: --host 0.0.0.0 --port 3002 --log-level debug
+
+  #*************************************************************
+  # tester: drives tests for acapy_plugin_toolbox in a         *
+  # "Juggernaut" fashion!                                      *
+  #*************************************************************
+
+  tests:
+    container_name: juggernaut
+    build:
+      context: ..
+      dockerfile: ./int/docker/Dockerfile.juggernaut.yml
+
+    environment:
+      - WAIT_BEFORE_HOSTS=3
+      - WAIT_HOSTS=agent:3000,echo:3002
+      - WAIT_HOSTS_TIMEOUT=60
+      - WAIT_SLEEP_INTERVAL=1
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - AGENT_HOST=agent
+      - AGENT_PORT=3000
+      - AGENT_BACKCHANNEL_PORT=3001
+      - SUITE_ENDPOINT=http://echo:3002
+      - SUITE_HOST=echo
+      - SUITE_PORT=3002
+      - DEVICE_TOKEN=${DEVICE_TOKEN}
+      - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
+    depends_on:
+      - agent
+      - echo

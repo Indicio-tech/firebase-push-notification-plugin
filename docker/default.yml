@@ -1,0 +1,32 @@
+label: Aries Cloud Agent + QA
+
+# Admin
+admin: [0.0.0.0, 3001]
+admin-insecure-mode: true
+
+# Load toolbox plugin
+plugin:
+  - firebase_push_notification
+
+plugin-config: docker/plugins-config.yml
+
+# Transport
+inbound-transport:
+  - [http, 0.0.0.0, 3000]
+  - [ws, 0.0.0.0, 3003]
+outbound-transport: http
+endpoint:
+  - http://agent:3000
+  - ws://agent:3003
+
+# Ledger
+no-ledger: true
+
+# Connections
+debug-connections: true
+debug-credentials: true
+debug-presentations: true
+auto-accept-invites: true
+auto-accept-requests: true
+connections-invite: true
+log-level: debug
