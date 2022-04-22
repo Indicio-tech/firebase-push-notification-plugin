@@ -1,0 +1,22 @@
+label: Aries Cloud Agent + firebase_push_notification
+
+# Transport
+inbound-transport:
+  - [http, 0.0.0.0, 8180]
+outbound-transport: http
+endpoint:
+  - http://localhost:8180
+no-ledger: true
+
+# Connections
+debug-connections: true
+debug-credentials: true
+debug-presentations: true
+auto-accept-invites: true
+auto-accept-requests: true
+auto-respond-messages: true
+
+# Invite on startup
+public-invites: true
+invite: true
+invite-multi-use: true
