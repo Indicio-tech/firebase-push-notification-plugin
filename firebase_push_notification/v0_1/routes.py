@@ -8,7 +8,6 @@ from aries_cloudagent.connections.models.conn_record import ConnRecord
 from aries_cloudagent.messaging.agent_message import AgentMessage
 from aries_cloudagent.messaging.responder import BaseResponder
 from aries_cloudagent.protocols.connections.v1_0.manager import ConnectionManager
-from .messages.question_delegated import QuestionDelegated
 
 import logging
 
