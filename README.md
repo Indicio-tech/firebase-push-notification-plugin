@@ -15,7 +15,7 @@ When starting up ACA-Py, load the plugin along with any other startup
 parameters.
 
 ```sh
-$ aca-py start --arg-file my_config.yml --plugin firebase_push_notification
+$ aca-py start --arg-file demo/config.yml --plugin firebase_push_notification
 ```
 ## Running Tests for development
 
