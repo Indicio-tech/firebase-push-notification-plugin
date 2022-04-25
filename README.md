@@ -8,14 +8,16 @@ Firebase Push Notification Plugin
 First, install this plugin into your environment.
 
 ```sh
-$ pip install git+https://github.com/Indicio-tech/firebase-push-notification-plugin.git
+$ poetry install
+$ poetry shell
+$ aca-py start --arg-file ./docker/default.yml
 ```
 
 When starting up ACA-Py, load the plugin along with any other startup
 parameters.
 
 ```sh
-$ aca-py start --arg-file demo/config.yml --plugin firebase_push_notification
+$ aca-py start --arg-file ./docker/default.yml
 ```
 ## Running Tests for development
 

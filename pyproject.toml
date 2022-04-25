@@ -12,7 +12,6 @@ python = "^3.6.9"
 aiohttp = "~=3.7.4"
 pydid = "~=0.3.0"
 aries-cloudagent = "0.7.3"
-firebase-push-notification = {git = "https://github.com/Indicio-tech/firebase-push-notification-plugin.git", branch = "main"}
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.0"
