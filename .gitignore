@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+fir-aca-py-firebase-adminsdk-*
+plugins-config.yml
+
 # Distribution / packaging
 .Python
 build/
