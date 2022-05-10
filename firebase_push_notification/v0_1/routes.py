@@ -1,8 +1,9 @@
 import logging
 import re
-from typing import Sequence
-
+import requests
+import json
 from typing import Optional, cast
+
 from aries_cloudagent.connections.models.conn_record import ConnRecord
 from aries_cloudagent.core.event_bus import Event, EventBus, EventWithMetadata
 from aries_cloudagent.core.profile import Profile, ProfileSession
@@ -12,7 +13,6 @@ from aries_cloudagent.messaging.responder import BaseResponder
 from aries_cloudagent.protocols.connections.v1_0.manager import ConnectionManager
 
 LOGGER = logging.getLogger(__name__)
-
 
 def register_events(event_bus: EventBus):
     """Register to handle events."""
@@ -45,6 +45,9 @@ def _derive_category(topic: str):
 async def handle_event(profile: Profile, event: EventWithMetadata):
     """Produce firebase events from aca-py events."""
     LOGGER.info("Firebase push notification")
+    configs = profile.settings["plugin_config"].get("firebase_plugin", {})
+    firebase_server_token = configs.get("firebase_server_token")
+    device_token = configs.get("device_token")
     wallet_id = cast(Optional[str], profile.settings.get("wallet.id"))
     payload = {
         "wallet_id": wallet_id or "base",
@@ -53,6 +56,20 @@ async def handle_event(profile: Profile, event: EventWithMetadata):
         "category": _derive_category(event.topic),
         "payload": event.payload,
     }
+    headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'key=' + firebase_server_token,
+        }
+    body = {
+            'notification': {'title': 'Sending push notification from ACA-Py',
+                                'body': 'Test push notification'
+                                },
+            'to':
+                device_token,
+            'priority': 'high',
+              'data': payload,
+            }
+    response = requests.post("https://fcm.googleapis.com/fcm/send",headers = headers, data=json.dumps(body))
     try:
         LOGGER.info(f"Sending firebase notification {payload}.")
     except Exception:
