@@ -1,8 +1,6 @@
 Firebase Push Notification Plugin
 =======================================
 
-[Add description]
-
 ## Installation and Usage
 
 First, install this plugin into your environment.
