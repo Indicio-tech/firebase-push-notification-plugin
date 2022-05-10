@@ -8,6 +8,8 @@ admin-insecure-mode: true
 plugin:
   - firebase_push_notification
 
+plugin-config: docker/plugins-config.yml
+
 # Transport
 inbound-transport:
   - [http, 0.0.0.0, 3000]
