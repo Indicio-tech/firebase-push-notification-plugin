@@ -14,6 +14,7 @@ from aries_cloudagent.protocols.connections.v1_0.manager import ConnectionManage
 
 LOGGER = logging.getLogger(__name__)
 
+
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
@@ -57,19 +58,21 @@ async def handle_event(profile: Profile, event: EventWithMetadata):
         "payload": event.payload,
     }
     headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'key=' + firebase_server_token,
-        }
+        "Content-Type": "application/json",
+        "Authorization": "key=" + firebase_server_token,
+    }
     body = {
-            'notification': {'title': 'Sending push notification from ACA-Py',
-                                'body': 'Test push notification'
-                                },
-            'to':
-                device_token,
-            'priority': 'high',
-              'data': payload,
-            }
-    response = requests.post("https://fcm.googleapis.com/fcm/send",headers = headers, data=json.dumps(body))
+        "notification": {
+            "title": "Sending push notification from ACA-Py",
+            "body": "Test push notification",
+        },
+        "to": device_token,
+        "priority": "high",
+        "data": payload,
+    }
+    response = requests.post(
+        "https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body)
+    )
     try:
         LOGGER.info(f"Sending firebase notification {payload}.")
     except Exception:
