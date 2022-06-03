@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 #**************************************************************
 # integration level test agents                                *
 #***************************************************************
@@ -10,7 +10,6 @@ services:
   #*************************************************************
 
   agent:
-    image: acapy-plugin
     build:
       context: ../
       dockerfile: ./int/Dockerfile
@@ -37,6 +36,8 @@ services:
     container_name: juggernaut
     build:
       context: .
+      dockerfile: ./docker/Dockerfile.juggernaut.yml
+
     environment:
       - WAIT_BEFORE_HOSTS=3
       - WAIT_HOSTS=agent:3000,echo:3002

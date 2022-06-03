@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Firebase push notification plugin"
 authors = ["Char Howland <char@indicio.tech>"]
 license = "Apache-2.0"
-readme="README.md"
 repository="https://github.com/Indicio-tech/firebase-push-notification-plugin.git"
 
 [tool.poetry.dependencies]

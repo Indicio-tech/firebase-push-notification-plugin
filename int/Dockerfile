@@ -10,7 +10,7 @@ ENV PATH="/opt/poetry/bin:$PATH"
 RUN poetry config virtualenvs.in-project true
 
 # Setup project
-RUN mkdir acapy_plugin_toolbox && touch acapy_plugin_toolbox/__init__.py
+RUN mkdir firebase_push_notification && touch firebase_push_notification/__init__.py
 COPY --chown=indy:indy pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
@@ -21,6 +21,6 @@ ENV PATH="/home/indy/.venv/bin:$PATH"
 
 COPY int/docker/int-testing-default.yml ./
 COPY int/docker/plugins-config-example.yml ./
-#COPY firebase_push_notification firebase_push_notification
+COPY firebase_push_notification firebase_push_notification
 ENTRYPOINT ["/bin/bash", "-c", "aca-py \"$@\"", "--"]
 CMD ["start", "--arg-file", "int-testing-default.yml"]
