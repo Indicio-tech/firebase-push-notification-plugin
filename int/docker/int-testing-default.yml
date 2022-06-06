@@ -13,9 +13,11 @@ plugin-config: plugins-config-example.yml
 # Transport
 inbound-transport:
   - [http, 0.0.0.0, 3000]
+  - [ws, 0.0.0.0, 3003]
 outbound-transport: http
 endpoint:
-  - http://localhost:3000
+  - http://agent:3000
+  - ws://agent:3003
 
 # Ledger
 no-ledger: true
