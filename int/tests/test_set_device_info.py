@@ -1,65 +1,67 @@
 import pytest
 import logging
-import asyncio
 
 from echo_agent import EchoClient
 
 LOGGER = logging.getLogger(__name__)
 
 
-
 ##############################################
+# # # import pyyaml module
+# import yaml
+# from yaml.loader import SafeLoader
 
-# import pyyaml module
-import yaml
-from yaml.loader import SafeLoader
+# # Open the file and load the file
+# with open('plugin-config.yml') as f:
+#     data = yaml.load(f, Loader=SafeLoader)
+#     device_token = data["device_token"]
 
-# Open the file and load the file
-with open('plugin-config.yml') as f:
-    data = yaml.load(f, Loader=SafeLoader)
-    device_token = data["device_token"]
-
+device_token = "cYHSGX-GSGanrP2msvHVti:APA91bHruQ6SVOoyESgdHQsJE2xbNyf3mWq9spEXbzHtbiv9jcs-ZE2ojC2KXc4Rbdt8ej9RXiYqasTLRP67IGy2rki1gT-JJBad4IxeIzkWgs6duNAHqFOwadTfI2fsBfZFKQe6PzrH"
 ##############################################
-
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create a session scoped event loop.
-    pytest.asyncio plugin provides a default function scoped event loop
-    which cannot be used as a dependency to session scoped fixtures.
-    """
-    return asyncio.get_event_loop()
-
-@pytest.fixture(scope="session")
-def echo_agent(suite_host, suite_port):
-    yield EchoClient(base_url=f"http://{suite_host}:{suite_port}")
-
-@pytest.fixture
-async def echo(echo_agent: EchoClient):
-    async with echo_agent:
-        yield echo_agent
-
-@pytest.fixture(scope="session")
-async def echo_connection(echo_agent: EchoClient, suite_seed, agent_connection):
-    async with echo_agent:
-        conn = await echo_agent.new_connection(
-            seed=suite_seed,
-            endpoint=agent_connection.my_endpoint,
-            their_vk=agent_connection.my_verkey,
-        )
-    yield conn
-    async with echo_agent:
-        await echo_agent.delete_connection(conn)
 
 
 @pytest.mark.asyncio
-async def test_set_device_info():
+async def test_set_get_device_info(echo, echo_connection):
+    
+    # set device info
     async with echo.session(echo_connection) as session:
         await echo.send_message_to_session(
             session,
             {
                 "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/set-device-info",
                 "device_token": device_token,
+            },
+        )
+
+    # get device info
+    async with echo.session(echo_connection) as session:
+        await echo.send_message_to_session(
+            session,
+            {
+                "@type": "https://didcomm.org/push-notifications-apns/1.0/get-device-info",
+            }
+        )
+
+    # retrieve device info message
+    device_info = await echo.get_message(
+        echo_connection,
+        session=session,
+        msg_type=(
+            "https://didcomm.org/push-notifications-apns/1.0/get-device-info"
+        )
+    )
+    assert device_info["device_token"] == device_token
+
+
+@pytest.mark.asyncio
+async def test_push_notification(echo, echo_connection):
+
+    async with echo.session(echo_connection) as session:
+        await echo.send_message_to_session(
+            session,
+            {
+                "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification",
+                "message_tag": "message_tag_placeholder",
+                "recipient_key": "recipient_key_placeholder"
             },
         )
