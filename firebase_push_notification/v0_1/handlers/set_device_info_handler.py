@@ -22,9 +22,9 @@ class SetDeviceInfoHandler(BaseHandler):
         self._logger.debug(f"ConnectionInvitationHandler called with context {context}")
         assert isinstance(context.message, SetDeviceInfo)
 
-        report = ConnectionProblemReport(
-            problem_code=ProblemReportReason.INVITATION_NOT_ACCEPTED,
-            explain="Connection invitations cannot be submitted via agent messaging",
-        )
-        # client likely needs to be using direct responses to receive the problem report
-        await responder.send_reply(report)
+        # report = ConnectionProblemReport(
+        #     problem_code=ProblemReportReason.INVITATION_NOT_ACCEPTED,
+        #     explain="Connection invitations cannot be submitted via agent messaging",
+        # )
+        # # client likely needs to be using direct responses to receive the problem report
+        # await responder.send_reply(report)

@@ -4,6 +4,8 @@ from aries_cloudagent.messaging.base_handler import (
     RequestContext,
 )
 
+from ..messages.get_device_info import GetDeviceInfo
+
 
 class GetDeviceInfoHandler(BaseHandler):
     """Handler class for getting device info."""
@@ -17,12 +19,15 @@ class GetDeviceInfoHandler(BaseHandler):
             responder: Responder callback
         """
 
-        self._logger.debug(f"ConnectionInvitationHandler called with context {context}")
+        self._logger.debug(f"GetDeviceInfoHandler called with context {context}")
         assert isinstance(context.message, GetDeviceInfo)
 
-        report = ConnectionProblemReport(
-            problem_code=ProblemReportReason.INVITATION_NOT_ACCEPTED,
-            explain="Connection invitations cannot be submitted via agent messaging",
-        )
-        # client likely needs to be using direct responses to receive the problem report
-        await responder.send_reply(report)
+        # TODO: add problem report
+        # report = ConnectionProblemReport(
+        #     problem_code=ProblemReportReason.INVITATION_NOT_ACCEPTED,
+        #     explain="Connection invitations cannot be submitted via agent messaging",
+        # )
+        # # client likely needs to be using direct responses to receive the problem report
+        # await responder.send_reply(report)
+
+
