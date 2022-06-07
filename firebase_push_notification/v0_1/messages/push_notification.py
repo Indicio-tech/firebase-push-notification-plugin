@@ -5,7 +5,7 @@ from ..message_types import PROTOCOL, PUSH_NOTIFICATION
 from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
 
 
-HANDLER_CLASS = f"{PROTOCOL}.handlers.push_notification_handler.PushNotificationHandler"
+HANDLER_CLASS = "firebase_push_notification.v0_1.handlers.push_notification_handler.PushNotificationHandler"
 
 
 class PushNotification(AgentMessage):

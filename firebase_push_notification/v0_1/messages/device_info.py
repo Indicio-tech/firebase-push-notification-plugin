@@ -5,7 +5,7 @@ from ..message_types import PROTOCOL, DEVICE_INFO
 from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
 
 
-HANDLER_CLASS = f"{PROTOCOL}.handlers.device_info_handler.DeviceInfoHandler"
+HANDLER_CLASS = "firebase_push_notification.v0_1.handlers.device_info_handler.DeviceInfoHandler"
 
 
 class DeviceInfo(AgentMessage):
