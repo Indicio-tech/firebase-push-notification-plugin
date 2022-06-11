@@ -40,7 +40,6 @@ async def test_set_get_device_info(echo, echo_connection):
         await echo.send_message_to_session(
             session,
             {
-                # "@type": "firebase_push_notification/1.0"
                 "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/get-device-info",
             }
         )
@@ -59,16 +58,16 @@ async def test_set_get_device_info(echo, echo_connection):
 
 
 
-@pytest.mark.asyncio
-async def test_push_notification(echo, echo_connection):
+# @pytest.mark.asyncio
+# async def test_push_notification(echo, echo_connection):
 
-    async with echo.session(echo_connection) as session:
-        await echo.send_message_to_session(
-            session,
-            {
-                "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification",
-                "message_tag": "message_tag_placeholder",
-                "recipient_key": "recipient_key_placeholder"
-            },
-        )
-    # TODO: assert that message was received?
+#     async with echo.session(echo_connection) as session:
+#         await echo.send_message_to_session(
+#             session,
+#             {
+#                 "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification",
+#                 "message_tag": "message_tag_placeholder",
+#                 "recipient_key": "recipient_key_placeholder"
+#             },
+#         )
+#     # TODO: assert that message was received?

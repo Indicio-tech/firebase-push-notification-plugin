@@ -77,3 +77,22 @@ async def handle_event(profile: Profile, event: EventWithMetadata):
         LOGGER.info(f"Sending firebase notification {payload}.")
     except Exception:
         LOGGER.exception("Firebase producer failed to send notification")
+
+
+from aiohttp import web
+
+from .message_types import SPEC_URI
+
+def post_process_routes(app: web.Application):
+    """Amend swagger API."""
+
+    # Add top-level tags description
+    if "tags" not in app._state["swagger_dict"]:
+        app._state["swagger_dict"]["tags"] = []
+    app._state["swagger_dict"]["tags"].append(
+        {
+            "name": "present-proof v2.0",
+            "description": "Proof presentation v2.0",
+            "externalDocs": {"description": "Specification", "url": SPEC_URI},
+        }
+    )

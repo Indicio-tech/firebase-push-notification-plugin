@@ -9,6 +9,7 @@ HANDLER_CLASS = "firebase_push_notification.v0_1.handlers.push_notification_hand
 
 
 class PushNotification(AgentMessage):
+
     class Meta:
         """Metadata for push notifications"""
 
