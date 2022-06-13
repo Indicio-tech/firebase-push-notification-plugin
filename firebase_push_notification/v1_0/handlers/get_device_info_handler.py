@@ -1,3 +1,5 @@
+import logging
+
 from aries_cloudagent.messaging.base_handler import (
     BaseHandler,
     BaseResponder,
@@ -5,6 +7,9 @@ from aries_cloudagent.messaging.base_handler import (
 )
 
 from ..messages.get_device_info import GetDeviceInfo
+from ..manager import PushNotificationManager
+
+LOGGER = logging.getLogger(__name__)
 
 
 class GetDeviceInfoHandler(BaseHandler):
@@ -18,9 +23,15 @@ class GetDeviceInfoHandler(BaseHandler):
             context: Request context
             responder: Responder callback
         """
-
+        profile = context.profile
+        LOGGER.debug("GetDeviceInfoHandler: %s", context.message_delivery.message_id)
         self._logger.debug(f"GetDeviceInfoHandler called with context {context}")
         assert isinstance(context.message, GetDeviceInfo)
+
+        credential_manager = PushNotificationManager(profile)
+        get_device_info = GetDeviceInfo()
+        credential_manager.send_device_info(get_device_info)
+
 
         # TODO: add problem report
         # report = ConnectionProblemReport(

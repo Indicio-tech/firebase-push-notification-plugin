@@ -1,11 +1,13 @@
 from marshmallow import fields, pre_dump, ValidationError, EXCLUDE
 
-from ..message_types import PROTOCOL, DEVICE_INFO
+from ..message_types import MESSAGE_TYPES, DEVICE_INFO
 
 from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
+from aries_cloudagent.core.profile import InjectionContext
+from aries_cloudagent.core.protocol_registry import ProtocolRegistry
+from aries_cloudagent.core.event_bus import EventBus
 
-
-HANDLER_CLASS = "firebase_push_notification.v0_1.handlers.device_info_handler.DeviceInfoHandler"
+HANDLER_CLASS = "firebase_push_notification.v1_0.handlers.device_info_handler.DeviceInfoHandler"
 
 
 class DeviceInfo(AgentMessage):
@@ -28,6 +30,15 @@ class DeviceInfo(AgentMessage):
         super().__init__(**kwargs)
         self.device_token = device_token
         self.thid = thid
+
+async def setup(context: InjectionContext, protocol_registry: ProtocolRegistry = None):
+    """Setup the connections plugin."""
+    if not protocol_registry:
+        protocol_registry = context.inject(ProtocolRegistry)
+
+    protocol_registry.register_message_types(MESSAGE_TYPES)
+    event_bus = context.inject(EventBus)
+
 
 
 class DeviceInfoSchema(AgentMessageSchema):

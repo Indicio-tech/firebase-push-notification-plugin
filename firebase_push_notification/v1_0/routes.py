@@ -18,9 +18,9 @@ LOGGER = logging.getLogger(__name__)
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
-    event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
-    event_bus.subscribe(STARTUP_EVENT_PATTERN, on_startup)
-    event_bus.subscribe(SHUTDOWN_EVENT_PATTERN, on_shutdown)
+    #event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
+    #event_bus.subscribe(STARTUP_EVENT_PATTERN, on_startup)
+    #event_bus.subscribe(SHUTDOWN_EVENT_PATTERN, on_shutdown)
 
 
 RECORD_RE = re.compile(r"acapy::record::([^:]*)(?:::(.*))?")
