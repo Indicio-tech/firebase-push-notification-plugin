@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acapy-plugin-toolbox-int-tests"
-version = "0.1.0"
+version = "1.0.0"
 description = "Integration tests for ACA-Py plugin toolbox"
 authors = ["Daniel Bluhm <dbluhm@pm.me>", "Char Howland <char@indicio.tech>"]
 license = "Apache-2.0"
