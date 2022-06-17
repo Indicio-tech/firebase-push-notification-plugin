@@ -15,6 +15,7 @@ SET_DEVICE_INFO = f"{SPEC_URI}/set-device-info"  # register device?
 GET_DEVICE_INFO = f"{SPEC_URI}/get-device-info"  # offer notification config?
 DEVICE_INFO = f"{SPEC_URI}/device-info"
 PUSH_NOTIFICATION = f"{SPEC_URI}/push-notification"
+PUSH_NOTIFICATION_ACK = f"{SPEC_URI}/push-notification-ack"
 
 MESSAGE_TYPES = DIDCommPrefix.qualify_all(
     {
@@ -22,5 +23,6 @@ MESSAGE_TYPES = DIDCommPrefix.qualify_all(
         GET_DEVICE_INFO: f"{PROTOCOL_PACKAGE}.messages.get_device_info.GetDeviceInfo",
         DEVICE_INFO: f"{PROTOCOL_PACKAGE}.messages.device_info.DeviceInfo",
         PUSH_NOTIFICATION: f"{PROTOCOL_PACKAGE}.messages.push_notification.PushNotification",
+        PUSH_NOTIFICATION_ACK: f"{PROTOCOL_PACKAGE}.messages.push_notification_ack.PushNotificationAck",
     }
 )

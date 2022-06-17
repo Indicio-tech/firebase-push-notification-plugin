@@ -4,25 +4,25 @@ from aries_cloudagent.messaging.base_handler import (
     RequestContext,
 )
 
+from ..messages.push_notification import PushNotification
+from ..messages.push_notification_ack import PushNotificationAck
+
 
 class PushNotificationHandler(BaseHandler):
-    """Handler class for setting device info."""
+    """Handler class for push notification."""
 
     async def handle(self, context: RequestContext, responder: BaseResponder):
         """
-        Handle connection invitation.
+        Handle push notification.
 
         Args:
             context: Request context
             responder: Responder callback
         """
 
-        self._logger.debug(f"ConnectionInvitationHandler called with context {context}")
+        self._logger.debug(f"PushNotificationHandler called with context {context}")
         assert isinstance(context.message, PushNotification)
 
-        report = ConnectionProblemReport(
-            problem_code=ProblemReportReason.INVITATION_NOT_ACCEPTED,
-            explain="Connection invitations cannot be submitted via agent messaging",
-        )
-        # client likely needs to be using direct responses to receive the problem report
-        await responder.send_reply(report)
+        push_notification_ack = PushNotificationAck()
+        push_notification_ack.assign_thread_from(context.message)
+        await responder.send_reply(push_notification_ack)
