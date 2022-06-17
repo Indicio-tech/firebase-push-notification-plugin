@@ -10,9 +10,8 @@ BASE = f"{PROTOCOL}/{VERSION}"
 
 PROTOCOL_PACKAGE = "firebase_push_notification.v1_0"
 
-# Message types
-SET_DEVICE_INFO = f"{SPEC_URI}/set-device-info"  # register device?
-GET_DEVICE_INFO = f"{SPEC_URI}/get-device-info"  # offer notification config?
+SET_DEVICE_INFO = f"{SPEC_URI}/set-device-info"
+GET_DEVICE_INFO = f"{SPEC_URI}/get-device-info"
 DEVICE_INFO = f"{SPEC_URI}/device-info"
 PUSH_NOTIFICATION = f"{SPEC_URI}/push-notification"
 PUSH_NOTIFICATION_ACK = f"{SPEC_URI}/push-notification-ack"

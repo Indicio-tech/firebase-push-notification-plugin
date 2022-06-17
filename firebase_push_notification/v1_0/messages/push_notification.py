@@ -44,5 +44,5 @@ class PushNotificationSchema(AgentMessageSchema):
     )
     recipient_key = fields.Str(
         required=False,
-        description="Recipient key",
+        description="Optional field for recipient key",
     )

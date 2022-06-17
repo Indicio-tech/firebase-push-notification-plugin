@@ -9,11 +9,6 @@ RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/opt/poetry/bin:$PATH"
 RUN poetry config virtualenvs.in-project true
 
-
-
-# --------------
-#FROM bcgovimages/von-image:py36-1.16-0
-#COPY --from=base --chown=indy:indy /home/indy/.venv /home/indy/.venv
 ENV PATH="/home/indy/.venv/bin:$PATH"
 
 # Setup project
