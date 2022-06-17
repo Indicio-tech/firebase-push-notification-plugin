@@ -1,31 +1,15 @@
 import pytest
 import logging
 
-from echo_agent import EchoClient
-
 LOGGER = logging.getLogger(__name__)
-
-
-##############################################
-
-# TODO: import from plugin-config.yml
-# # # import pyyaml module
-# import yaml
-# from yaml.loader import SafeLoader
-
-# # Open the file and load the file
-# with open('plugin-config.yml') as f:
-#     data = yaml.load(f, Loader=SafeLoader)
-#     device_token = data["device_token"]
-
-device_token = "cYHSGX-GSGanrP2msvHVti:APA91bHruQ6SVOoyESgdHQsJE2xbNyf3mWq9spEXbzHtbiv9jcs-ZE2ojC2KXc4Rbdt8ej9RXiYqasTLRP67IGy2rki1gT-JJBad4IxeIzkWgs6duNAHqFOwadTfI2fsBfZFKQe6PzrH"
-##############################################
 
 
 @pytest.mark.asyncio
 async def test_set_get_device_info(echo, echo_connection):
-    
-    # set device info
+    """Test for setting and getting device info"""
+
+    device_token = "device_token_placeholder"
+
     async with echo.session(echo_connection) as session:
         await echo.send_message_to_session(
             session,
