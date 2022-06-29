@@ -8,7 +8,7 @@ admin-insecure-mode: true
 plugin:
   - firebase_push_notification
 
-plugin-config: plugins-config-example.yml
+plugin-config: plugins-config.yml
 
 # Transport
 inbound-transport:

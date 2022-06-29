@@ -50,6 +50,7 @@ services:
       - SUITE_ENDPOINT=http://echo:3002
       - SUITE_HOST=echo
       - SUITE_PORT=3002
+      - FIREBASE_DEVICE_TOKEN_INT_TESTS=${FIREBASE_DEVICE_TOKEN_INT_TESTS}
     depends_on:
       - agent
       - echo

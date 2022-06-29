@@ -5,6 +5,7 @@ from aries_cloudagent.messaging.base_handler import (
 )
 
 from ..messages.set_device_info import SetDeviceInfo
+from ..messages.device_info import DeviceInfo
 from ..models.device_record import DeviceRecord
 
 
@@ -13,7 +14,7 @@ class SetDeviceInfoHandler(BaseHandler):
 
     async def handle(self, context: RequestContext, responder: BaseResponder):
         """
-        Handle setting device info.
+        Handler setting device info. Responds with DeviceInfo message.
 
         Args:
             context: Request context
@@ -32,3 +33,8 @@ class SetDeviceInfoHandler(BaseHandler):
                 session,
                 reason="Save device info"
             )
+
+            records = await DeviceRecord.query(session, {})
+            device_info = DeviceInfo(device_token=records[0].device_token)
+            device_info.assign_thread_from(context.message)
+            await responder.send_reply(device_info)
