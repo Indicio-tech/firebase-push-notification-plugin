@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "acapy-plugin-toolbox-int-tests"
+name = "firebase-push-notification-int-tests"
 version = "1.0.0"
-description = "Integration tests for ACA-Py plugin toolbox"
-authors = ["Daniel Bluhm <dbluhm@pm.me>", "Char Howland <char@indicio.tech>"]
+description = "Integration tests for firebase push notifications"
+authors = ["Char Howland <char@indicio.tech>", "Adam Burdett <adam@indicio.tech>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]

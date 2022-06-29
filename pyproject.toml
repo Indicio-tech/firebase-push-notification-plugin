@@ -2,7 +2,7 @@
 name = "firebase-push-notification"
 version = "1.0.0"
 description = "Firebase push notification plugin"
-authors = ["Char Howland <char@indicio.tech>"]
+authors = ["Char Howland <char@indicio.tech>", "Adam Burdett <adam@indicio.tech>"]
 license = "Apache-2.0"
 repository="https://github.com/Indicio-tech/firebase-push-notification-plugin.git"
 
