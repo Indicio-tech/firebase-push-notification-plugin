@@ -20,13 +20,15 @@ class PushNotification(AgentMessage):
     def __init__(
         self,
         *,
-        message_tag: str = None,
+        message_id: str = None,
         recipient_key: str = None,
+        priority: str = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.message_tag = message_tag
+        self.message_id = message_id
         self.recipient_key = recipient_key
+        self.priority = priority
 
 
 class PushNotificationSchema(AgentMessageSchema):
@@ -38,11 +40,16 @@ class PushNotificationSchema(AgentMessageSchema):
         model_class = PushNotification
         unknown = EXCLUDE
 
-    message_tag = fields.Str(
+    message_id = fields.Str(
         required=False,
         description="Optional field to connect the push notification to a DIDcomm message",
     )
     recipient_key = fields.Str(
-        required=False,
+        required=True,
         description="Optional field for recipient key",
+    )
+    priority = fields.Str(
+        required=False,
+        default="high",
+        description="Optional field for priority of message",
     )

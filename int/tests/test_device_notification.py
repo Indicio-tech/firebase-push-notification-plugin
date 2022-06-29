@@ -88,7 +88,7 @@ async def test_push_notification(echo, echo_connection):
             session,
             {
                 "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification",
-                "message_tag": "message_tag_placeholder",
+                "message_id": "message_id_placeholder",
                 "recipient_key": "recipient_key_placeholder"
             },
         )
