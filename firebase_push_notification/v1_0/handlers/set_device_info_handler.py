@@ -26,6 +26,7 @@ class SetDeviceInfoHandler(BaseHandler):
 
         device_record = DeviceRecord(
             device_token=context.message.device_token,
+            connection_id=context.connection_record.connection_id,
         )
 
         async with context.profile.session() as session:
