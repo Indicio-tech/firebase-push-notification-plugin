@@ -20,6 +20,11 @@ from acapy_client.models import (
 from echo_agent import EchoClient
 import pytest
 
+from aries_cloudagent.core.event_bus import EventBus, Event, MockEventBus
+from aries_cloudagent.core.in_memory import InMemoryProfile
+from aries_cloudagent.messaging.responder import BaseResponder, MockResponder
+from aries_cloudagent.core.protocol_registry import ProtocolRegistry
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -138,3 +143,25 @@ async def echo_connection(echo_agent: EchoClient, suite_seed, agent_connection):
     yield conn
     async with echo_agent:
         await echo_agent.delete_connection(conn)
+
+
+@pytest.fixture
+def event_bus():
+    """Event bus fixture."""
+    yield EventBus()
+
+@pytest.fixture
+def mock_responder():
+    """Mock responder fixture."""
+    yield MockResponder()
+
+@pytest.fixture
+def profile(event_bus, mock_responder):
+    """Profile fixture."""
+    yield InMemoryProfile.test_profile(
+        bind={
+            EventBus: event_bus,
+            BaseResponder: mock_responder,
+            ProtocolRegistry: ProtocolRegistry(),
+        }
+    )
