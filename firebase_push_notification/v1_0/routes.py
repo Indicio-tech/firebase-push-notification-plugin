@@ -1,8 +1,8 @@
 import logging
 import re
+import os
 import requests
 import json
-from typing import Optional, cast
 from aiohttp import web
 from aiohttp_apispec import (
     docs,
@@ -20,72 +20,67 @@ from .messages.push_notification import PushNotificationSchema
 from .messages.push_notification_ack import PushNotificationAckSchema
 from .messages.push_notification import PushNotification
 from .handlers.push_notification_handler import PushNotificationHandler
+from .models.device_record import DeviceRecord
 
 LOGGER = logging.getLogger(__name__)
 
+UNDELIVERABLE_RE = re.compile(r"acapy::outbound_message::undeliverable")
 
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
-    event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
+    event_bus.subscribe(UNDELIVERABLE_RE, firebase_push_notification_handler)
 
 
-RECORD_RE = re.compile(r"acapy::record::([^:]*)(?:::(.*))?")
-WEBHOOK_RE = re.compile(r"acapy::webhook::{.*}")
-
-
-async def on_startup(profile: Profile, event: Event):
-    LOGGER.info("Starting Firebase!")
-
-
-async def on_shutdown(profile: Profile, event: Event):
-    LOGGER.info("shuting down firebase!")
-
-
-def _derive_category(topic: str):
-    match = RECORD_RE.match(topic)
-    if match:
-        return match.group(1)
-    if WEBHOOK_RE.match(topic):
-        return "webhook"
-
-
-async def handle_event(profile: Profile, event: EventWithMetadata):
+async def firebase_push_notification_handler(profile: Profile, event: EventWithMetadata):
     """Produce firebase events from aca-py events."""
     LOGGER.info("Firebase push notification")
-    configs = profile.settings["plugin_config"].get("firebase_plugin", {})
-    firebase_server_token = configs.get("firebase_server_token")
-    device_token = configs.get("device_token")
-    wallet_id = cast(Optional[str], profile.settings.get("wallet.id"))
-    payload = {
-        "wallet_id": wallet_id or "base",
-        "state": event.payload.get("state"),
-        "topic": event.topic,
-        "category": _derive_category(event.topic),
-        "payload": event.payload,
-    }
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "key=" + firebase_server_token,
-    }
-    body = {
-        "notification": {
-            "title": "Sending push notification from ACA-Py",
-            "body": "Test push notification",
-        },
-        "to": device_token,
-        "priority": "high",
-        "data": payload,
-    }
-    LOGGER.info(f"Routes body {body}")
-    LOGGER.info(f"Routes headers {headers}")
-    response = requests.post(
-        "https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body)
-    )
-    try:
-        LOGGER.info(f"In routes sending firebase notification {payload}.")
-    except Exception:
-        LOGGER.exception("Firebase producer failed to send notification")
+    device_token = os.getenv("FIREBASE_DEVICE_TOKEN_INT_TESTS")
+    firebase_server_token = os.getenv("FIREBASE_SERVER_TOKEN")
+
+    # Retrieve the connection_id of the undeliverable message from the event payload
+    connection_id = event.payload.get("connection_id")
+    LOGGER.info(f"Connection_id: {connection_id}")
+
+    # Use the connection_id to query the device records
+    async with profile.session() as session:
+        results = await DeviceRecord.query_by_connection_id(
+            session=session,
+            connection_id=connection_id,
+        )
+        LOGGER.info(f"Query results: {results}")
+
+        # Retrieve the device_token associated with the connection_id
+        if results:
+            device_token = results.device_token
+        # TODO: anticipate collisions
+
+        push_notification = PushNotification(
+            message_id=event.payload.get("message_id"),
+            message_tag=event.payload.get("message_tag"),
+        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "key=" + firebase_server_token,
+        }
+        body = {
+            "notification": {
+                "title": "Sending push notification from ACA-Py",
+                "body": "Test push notification",
+            },
+            "to": device_token,
+            "priority": "high",
+            "data": push_notification,
+        }
+        LOGGER.info(f"Body {body}")
+        LOGGER.info(f"Headers {headers}")
+        response = requests.post(
+            "https://fcm.googleapis.com/fcm/send", headers=headers, data=body  # previously json.dumps(body)
+        )
+        try:
+            LOGGER.info(f"In routes sending firebase notification {push_notification}.")
+        except Exception:
+            LOGGER.exception("Firebase producer failed to send notification")
 
 
 
