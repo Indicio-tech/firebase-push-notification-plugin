@@ -7,10 +7,11 @@ ENV WAIT_VERSION 2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
 RUN chmod +x /wait
 
-COPY pyproject.toml .
-COPY poetry.lock .
+COPY int/pyproject.toml .
+COPY int/poetry.lock .
 RUN poetry install --no-dev
 
-COPY tests/* tests/
+COPY int/tests/* tests/
+COPY firebase_push_notification tests/firebase_push_notification
 
-ENTRYPOINT ["/bin/sh", "-c", "/wait && poetry run pytest \"$@\"", "--"]
+ENTRYPOINT ["/bin/sh", "-c", "/wait && poetry run pytest -s \"$@\"", "--"]

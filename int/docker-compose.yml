@@ -35,8 +35,8 @@ services:
   tests:
     container_name: juggernaut
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile.juggernaut.yml
+      context: ..
+      dockerfile: ./int/docker/Dockerfile.juggernaut.yml
 
     environment:
       - WAIT_BEFORE_HOSTS=3
@@ -51,6 +51,7 @@ services:
       - SUITE_HOST=echo
       - SUITE_PORT=3002
       - FIREBASE_DEVICE_TOKEN_INT_TESTS=${FIREBASE_DEVICE_TOKEN_INT_TESTS}
+      - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
     depends_on:
       - agent
       - echo
