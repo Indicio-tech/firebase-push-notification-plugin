@@ -21,12 +21,14 @@ class PushNotification(AgentMessage):
         self,
         *,
         message_id: str = None,
+        message_tag: str = None,
         recipient_key: str = None,
         priority: str = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.message_id = message_id
+        self.message_tag = message_tag
         self.recipient_key = recipient_key
         self.priority = priority
 
@@ -41,6 +43,10 @@ class PushNotificationSchema(AgentMessageSchema):
         unknown = EXCLUDE
 
     message_id = fields.Str(
+        required=False,
+        description="Optional field to connect the push notification to a DIDcomm message",
+    )
+    message_tag = fields.Str(
         required=False,
         description="Optional field to connect the push notification to a DIDcomm message",
     )
