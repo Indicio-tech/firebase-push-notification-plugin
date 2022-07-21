@@ -83,51 +83,6 @@ async def test_get_device_info(echo, echo_connection):
     assert device_info["device_token"] == device_token
 
 
-
-@pytest.mark.asyncio
-async def test_push_notification(echo, echo_connection):
-    """"Test for sending push notification and receiving push
-    notification acknowledgement"""
-
-    device_token = os.getenv("FIREBASE_DEVICE_TOKEN_INT_TESTS")
-    
-    async with echo.session(echo_connection) as session:
-        await echo.send_message_to_session(
-            session,
-            {
-                "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/set-device-info",
-                "device_token": device_token,
-            },
-        )
-
-        await echo.get_message(
-            echo_connection,
-            session=session,
-            msg_type=(
-                "https://didcomm.org/push-notifications-fcm-android/1.0/device-info"
-            )
-        )
-
-    async with echo.session(echo_connection) as session:
-
-        await echo.send_message_to_session(
-            session,
-            {
-                "@type": "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification",
-                "message_id": "message_id_placeholder",
-                "recipient_key": "recipient_key_placeholder"
-            },
-        )
-
-        await echo.get_message(
-            echo_connection,
-            session=session,
-            msg_type=(
-                "https://didcomm.org/push-notifications-fcm-android/1.0/push-notification-ack"
-            )
-        )
-
-
 @pytest.mark.asyncio
 async def test_firebase_push_notification_handler(event_bus, profile):
     # Create device record
