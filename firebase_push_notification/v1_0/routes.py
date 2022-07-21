@@ -3,23 +3,11 @@ import re
 import os
 import requests
 import json
-from aiohttp import web
-from aiohttp_apispec import (
-    docs,
-    request_schema,
-    response_schema,
-)
 
-from aries_cloudagent.core.event_bus import Event, EventBus, EventWithMetadata
+from aries_cloudagent.core.event_bus import EventBus, EventWithMetadata
 from aries_cloudagent.core.profile import Profile
-from aries_cloudagent.messaging.responder import BaseResponder
-from aries_cloudagent.messaging.request_context import RequestContext
-from aries_cloudagent.admin.request_context import AdminRequestContext
 
-from .messages.push_notification import PushNotificationSchema
-from .messages.push_notification_ack import PushNotificationAckSchema
 from .messages.push_notification import PushNotification
-from .handlers.push_notification_handler import PushNotificationHandler
 from .models.device_record import DeviceRecord
 
 LOGGER = logging.getLogger(__name__)
@@ -70,54 +58,15 @@ async def firebase_push_notification_handler(profile: Profile, event: EventWithM
             },
             "to": device_token,
             "priority": "high",
-            "data": push_notification,
+            "data": push_notification.serialize(),
         }
         LOGGER.info(f"Body {body}")
         LOGGER.info(f"Headers {headers}")
+
         response = requests.post(
-            "https://fcm.googleapis.com/fcm/send", headers=headers, data=body  # previously json.dumps(body)
+            "https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body)
         )
         try:
             LOGGER.info(f"In routes sending firebase notification {push_notification}.")
         except Exception:
             LOGGER.exception("Firebase producer failed to send notification")
-
-
-
-async def register(app: web.Application):
-    app.add_routes(
-        [
-            web.post("/push-notification/{firebase_server_token}{device_token}", push_notification),
-        ]
-    )
-
-
-@docs(
-    tags=["pushnotification"],
-    summary="Send a push notification",
-)
-@request_schema(PushNotificationSchema())
-@response_schema(PushNotificationAckSchema(), 200, description="")
-async def push_notification(request: web.BaseRequest):
-
-    body = await request.json()
-    handler = PushNotificationHandler(
-        device_token = body.get("device_token")
-    )
-
-    context: AdminRequestContext = request["context"]
-    profile = context.profile
-    request_context = RequestContext(profile=profile)
-    request_context.message = PushNotification(
-        message_id="placeholder",
-        recipient_key="placeholder",
-        priority="default",
-    )
-    responder = context.injector.inject(BaseResponder)
-
-    await handler.handle(
-        context=request_context,
-        responder=responder
-    )
-
-    return web.json_response()
