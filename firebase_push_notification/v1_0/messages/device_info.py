@@ -5,16 +5,12 @@ from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageS
 from ..message_types import DEVICE_INFO
 
 
-HANDLER_CLASS = "firebase_push_notification.v1_0.handlers.device_info_handler.DeviceInfoHandler"
-
-
 class DeviceInfo(AgentMessage):
     """Class for device info."""
 
     class Meta:
         """Metadata for device info."""
 
-        handler_class = HANDLER_CLASS
         message_type = DEVICE_INFO
         schema_class = "DeviceInfoSchema"
 
