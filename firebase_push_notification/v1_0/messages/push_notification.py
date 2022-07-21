@@ -5,15 +5,11 @@ from ..message_types import PUSH_NOTIFICATION
 from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageSchema
 
 
-HANDLER_CLASS = "firebase_push_notification.v1_0.handlers.push_notification_handler.PushNotificationHandler"
-
-
 class PushNotification(AgentMessage):
 
     class Meta:
         """Metadata for push notifications"""
 
-        handler_class = HANDLER_CLASS
         message_type = PUSH_NOTIFICATION
         schema_class = "PushNotificationSchema"
 
