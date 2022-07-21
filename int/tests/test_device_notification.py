@@ -5,7 +5,7 @@ import re
 
 from aries_cloudagent.core.event_bus import EventBus, Event, MockEventBus
 
-from .firebase_push_notification.v1_0.routes import register_events, firebase_push_notification_handler
+from .firebase_push_notification.v1_0.routes import register_events
 from .firebase_push_notification.v1_0.models.device_record import DeviceRecord
 
 
@@ -96,6 +96,7 @@ async def test_firebase_push_notification_handler(event_bus, profile):
             session,
             reason="Save device info"
         )
+    assert device_record.device_token != "device_token_placeholder"
 
     # Trigger push notification handler
     topic = "acapy::outbound_message::undeliverable"
@@ -106,6 +107,6 @@ async def test_firebase_push_notification_handler(event_bus, profile):
         "state": "received",
         }
     event = Event(topic, payload)
+
     register_events(event_bus)
-    await firebase_push_notification_handler(profile, event)
-    # await event_bus.notify(profile, event)
+    await event_bus.notify(profile, event)
