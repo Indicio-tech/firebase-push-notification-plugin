@@ -25,6 +25,8 @@ async def firebase_push_notification_handler(profile: Profile, event: EventWithM
     LOGGER.info("Firebase push notification")
     device_token = os.getenv("FIREBASE_DEVICE_TOKEN_INT_TESTS")
     firebase_server_token = os.getenv("FIREBASE_SERVER_TOKEN")
+    assert device_token
+    assert firebase_server_token
 
     # Retrieve the connection_id of the undeliverable message from the event payload
     connection_id = event.payload.get("connection_id")
