@@ -2,11 +2,7 @@
 from aries_cloudagent.protocols.didcomm_prefix import DIDCommPrefix
 
 
-SPEC_URI = "https://didcomm.org/push-notifications-fcm-android/1.0"
-
-PROTOCOL = "firebase-push-notification"
-VERSION = "1.0"
-BASE = f"{PROTOCOL}/{VERSION}"
+SPEC_URI = "https://didcomm.org/push-notifications-fcm/1.0"
 
 PROTOCOL_PACKAGE = "firebase_push_notification.v1_0"
 
