@@ -23,9 +23,8 @@ def register_events(event_bus: EventBus):
 async def firebase_push_notification_handler(profile: Profile, event: EventWithMetadata):
     """Produce firebase events from aca-py events."""
     LOGGER.info("Firebase push notification")
-    device_token = os.getenv("FIREBASE_DEVICE_TOKEN_INT_TESTS")
+
     firebase_server_token = os.getenv("FIREBASE_SERVER_TOKEN")
-    assert device_token
     assert firebase_server_token
 
     # Retrieve the connection_id of the undeliverable message from the event payload
@@ -43,8 +42,8 @@ async def firebase_push_notification_handler(profile: Profile, event: EventWithM
         # Retrieve the device_token associated with the connection_id
         if results:
             device_token = results.device_token
-        # TODO: anticipate collisions
-
+            # TODO: anticipate collisions
+            assert device_token
         push_notification = PushNotification(
             message_id=event.payload.get("message_id"),
             message_tag=event.payload.get("message_tag"),
