@@ -40,7 +40,7 @@ class PushNotificationSchema(AgentMessageSchema):
 
     message_id = fields.Str(
         required=False,
-        description="Optional field to connect the push notification to a DIDcomm message",
+        description="Optional field to pickup the message from the mediator that the notification was linked to",
     )
     message_tag = fields.Str(
         required=False,
