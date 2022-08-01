@@ -10,14 +10,17 @@ from aries_cloudagent.core.profile import Profile
 from .messages.push_notification import PushNotification
 from .models.device_record import DeviceRecord
 
+
 LOGGER = logging.getLogger(__name__)
 
 UNDELIVERABLE_RE = re.compile(r"acapy::outbound_message::undeliverable")
+
 
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
     event_bus.subscribe(UNDELIVERABLE_RE, firebase_push_notification_handler)
+    event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
 
 
 async def firebase_push_notification_handler(profile: Profile, event: EventWithMetadata):
@@ -71,3 +74,40 @@ async def firebase_push_notification_handler(profile: Profile, event: EventWithM
             LOGGER.info(f"In routes sending firebase notification {push_notification}.")
         except Exception:
             LOGGER.exception("Firebase producer failed to send notification")
+
+
+
+async def handle_event(profile: Profile, event: EventWithMetadata):
+    """
+    Proof of concept for manual testing.
+
+    Produce firebase events from aca-py events."""
+    LOGGER.info("Firebase push notification")
+    configs = profile.settings["plugin_config"].get("firebase_plugin", {})
+    firebase_server_token = configs.get("firebase_server_token")
+    device_token = configs.get("device_token")
+    payload = {
+        "payload": event.payload,
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "key=" + firebase_server_token,
+    }
+    body = {
+        "notification": {
+            "title": "Sending push notification from ACA-Py",
+            "body": "Test push notification",
+        },
+        "to": device_token,
+        "priority": "high",
+        "data": payload,
+    }
+    LOGGER.info(f"Routes body {body}")
+    LOGGER.info(f"Routes headers {headers}")
+    response = requests.post(
+        "https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body)
+    )
+    try:
+        LOGGER.info(f"In routes sending firebase notification {payload}.")
+    except Exception:
+        LOGGER.exception("Firebase producer failed to send notification")
