@@ -78,7 +78,7 @@ Version: `1.0`
 ## Registering a Device Token
 
 #### Set Device Info
-When a notification receiver wants to receive notifications of undeliverable messages from a mediator, they can register a new device token using the `set-device-info` message over the mediated connection. The `set-device-info` message below registers, updates, or removes the device token from the mediator. To stop receiving push notifications, the notification receive can send the above message where ALL values are be null.
+When a notification receiver wants to receive notifications of undeliverable messages from a mediator, they can register a new device token using the `set-device-info` message over the mediated connection. The `set-device-info` message below registers, updates, or removes the device token from the mediator. To stop receiving push notifications, the notification receiver can send the above message where ALL values are null.
 
 ```
 {
