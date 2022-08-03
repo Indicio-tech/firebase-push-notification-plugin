@@ -1,4 +1,4 @@
-label: Aries Cloud Agent + QA
+label: Relay
 
 # Admin
 admin: [0.0.0.0, 3001]
@@ -16,8 +16,8 @@ inbound-transport:
   - [ws, 0.0.0.0, 3003]
 outbound-transport: http
 endpoint:
-  - http://agent:3000
-  - ws://agent:3003
+  - http://relay:3000
+  - ws://relay:3003
 
 # Ledger
 no-ledger: true
@@ -30,3 +30,6 @@ auto-accept-invites: true
 auto-accept-requests: true
 connections-invite: true
 log-level: debug
+
+# Mediation
+open-mediation: true
