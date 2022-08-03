@@ -3,12 +3,25 @@ import re
 import os
 import requests
 import json
+from aiohttp import web
+from aiohttp_apispec import (
+    docs,
+    request_schema,
+    response_schema,
+)
 
 from aries_cloudagent.core.event_bus import EventBus, EventWithMetadata
 from aries_cloudagent.core.profile import Profile
+from aries_cloudagent.messaging.responder import BaseResponder
+from aries_cloudagent.messaging.request_context import RequestContext
+from aries_cloudagent.admin.request_context import AdminRequestContext
+from aries_cloudagent.connections.models.conn_record import ConnRecord
 
 from .messages.push_notification import PushNotification
 from .models.device_record import DeviceRecord
+from .handlers.set_device_info_handler import SetDeviceInfoHandler
+from .messages.set_device_info import SetDeviceInfo, SetDeviceInfoSchema
+from .messages.device_info import DeviceInfoSchema
 
 
 LOGGER = logging.getLogger(__name__)
@@ -111,3 +124,43 @@ async def handle_event(profile: Profile, event: EventWithMetadata):
         LOGGER.info(f"In routes sending firebase notification {payload}.")
     except Exception:
         LOGGER.exception("Firebase producer failed to send notification")
+
+
+
+async def register(app: web.Application):
+    app.add_routes(
+        [
+            web.post("/push-notification/{device_token}{connection_id}", register_device_token),
+        ]
+    )
+
+
+@docs(
+    tags=["pushnotification"],
+    summary="Manually add a device token to a mediated connection",
+)
+@request_schema(SetDeviceInfoSchema())
+@response_schema(DeviceInfoSchema(), 200, description="")
+async def register_device_token(request: web.BaseRequest):
+
+    body = await request.json()
+    handler = SetDeviceInfoHandler()
+
+    context: AdminRequestContext = request["context"]
+    profile = context.profile
+    request_context = RequestContext(profile=profile)
+    request_context.message = SetDeviceInfo(device_token=body["device_token"])
+
+    # Use connection_id to retrieve ConnRecord
+    connection_id = request.match_info["connection_id"]
+    async with profile.session() as session:
+        request_context.connection_record = await ConnRecord.retrieve_by_id(session, connection_id)
+
+    responder = context.injector.inject(BaseResponder)
+
+    await handler.handle(
+        context=request_context,
+        responder=responder
+    )
+
+    return web.json_response()
