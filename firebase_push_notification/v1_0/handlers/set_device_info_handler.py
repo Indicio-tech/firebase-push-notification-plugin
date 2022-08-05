@@ -24,9 +24,21 @@ class SetDeviceInfoHandler(BaseHandler):
         self._logger.debug(f"SetDeviceInfoHandler called with context {context}")
         assert isinstance(context.message, SetDeviceInfo)
 
-        device_record = DeviceRecord(
+        device_info = await self.set_device_handler(
+            context,
             device_token=context.message.device_token,
             connection_id=context.connection_record.connection_id,
+            )
+        device_info.assign_thread_from(context.message)
+        await responder.send_reply(device_info)
+
+    async def set_device_info_handler(self, context: RequestContext, device_token, connection_id):
+        """
+        Create and save DeviceRecord, create and return DeviceInfo
+        """
+        device_record = DeviceRecord(
+            device_token=device_token,
+            connection_id=connection_id,
         )
 
         async with context.profile.session() as session:
@@ -37,5 +49,5 @@ class SetDeviceInfoHandler(BaseHandler):
 
             records = await DeviceRecord.query(session, {})
             device_info = DeviceInfo(device_token=records[0].device_token)
-            device_info.assign_thread_from(context.message)
-            await responder.send_reply(device_info)
+        
+        return device_info
