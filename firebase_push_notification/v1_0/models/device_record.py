@@ -47,6 +47,6 @@ class DeviceRecordSchema(BaseRecordSchema):
     device_token = fields.Str(
         required=True, description="The token that is required by the notification provider"
     )
-    connction_id = fields.Str(
+    connection_id = fields.Str(
         required=True, description="The connection_id of the undeliverable message"
     )
