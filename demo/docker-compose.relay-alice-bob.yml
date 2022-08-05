@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+
+  relay:
+    build:
+      context: ../
+      dockerfile: ./int/Dockerfile
+    environment:
+      - ACAPY_TOOLBOX_LOG_LEVEL=DEBUG
+      - DEVICE_TOKEN=${DEVICE_TOKEN}
+      - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
+    ports:
+      - "3001:3001"
+    command: >
+      start --arg-file int-testing-default.yml --webhook-url http://webhook-listener:8080
+
+  agent-bob:
+    image: acapy-toolbox
+    build:
+      context: ../
+      dockerfile: ./demo/Dockerfile
+    volumes:
+      - ./configs:/home/indy/configs:ro,z
+    environment:
+      # Modify for more log output
+      ACAPY_TOOLBOX_LOG_LEVEL: WARNING
+    ports:
+      - "3006:3006"
+      - "3002:3002"
+    command: start --arg-file ./configs/bob.yml --webhook-url http://webhook-listener:8080
+
+  agent-alice:
+    image: acapy-toolbox
+    build:
+      context: ../
+      dockerfile: ./demo/Dockerfile
+    volumes:
+      - ./configs:/home/indy/configs:ro,z
+    environment:
+      # Modify for more log output
+      ACAPY_TOOLBOX_LOG_LEVEL: WARNING
+    ports:
+      - "3007:3007"
+      - "4002:4002"
+    command: start --arg-file ./configs/alice.yml --webhook-url http://webhook-listener:8080
+
+  webhook-listener:
+    image: mendhak/http-https-echo:18
+    environment:
+      - HTTP_PORT=8080
