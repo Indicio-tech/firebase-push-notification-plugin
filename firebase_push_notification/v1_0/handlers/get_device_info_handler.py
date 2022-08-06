@@ -28,10 +28,13 @@ class GetDeviceInfoHandler(BaseHandler):
         self._logger.debug(f"GetDeviceInfoHandler called with context {context}")
         assert isinstance(context.message, GetDeviceInfo)
 
-        session = await context.session()
-        records = await DeviceRecord.query(session, {})
-        device_info = DeviceInfo(device_token=records[0].device_token)
+        device_info = await self.get_device_info_handler(context)
         device_info.assign_thread_from(context.message)
         await responder.send_reply(device_info)
 
+    async def get_device_info_handler(self, context: RequestContext):
+        session = await context.session()
+        records = await DeviceRecord.query(session, {})
+        device_info = DeviceInfo(device_token=records[0].device_token)
 
+        return device_info
