@@ -27,13 +27,15 @@ from .messages.device_info import DeviceInfoSchema
 LOGGER = logging.getLogger(__name__)
 
 UNDELIVERABLE_RE = re.compile(r"acapy::outbound_message::undeliverable")
+FORWARD_RE = re.compile(r"acapy::forward::received")
 
 
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
     event_bus.subscribe(UNDELIVERABLE_RE, firebase_push_notification_handler)
-    event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
+    event_bus.subscribe(FORWARD_RE, firebase_push_notification_handler)
+    # event_bus.subscribe(re.compile(re.compile(".*")), handle_event)
 
 
 async def firebase_push_notification_handler(profile: Profile, event: EventWithMetadata):
