@@ -1,26 +1,27 @@
-import logging
-import re
-import os
-import requests
 import json
-from aiohttp import web
-from aiohttp_apispec import (
-    docs,
-    response_schema,
-    match_info_schema,
-)
-from marshmallow import fields
+import logging
+import os
+import re
 
+import requests
+from aiohttp import web
+from aiohttp_apispec import (docs, match_info_schema, request_schema,
+                             response_schema)
+from aries_cloudagent.admin.request_context import AdminRequestContext
 from aries_cloudagent.core.event_bus import EventBus, EventWithMetadata
 from aries_cloudagent.core.profile import Profile
-from aries_cloudagent.admin.request_context import AdminRequestContext
 from aries_cloudagent.messaging.models.openapi import OpenAPISchema
+from aries_cloudagent.messaging.request_context import RequestContext
 from aries_cloudagent.messaging.valid import UUIDFour
+from aries_cloudagent.messaging.responder import BaseResponder
+from marshmallow import fields
 
-from .messages.push_notification import PushNotification
-from .models.device_record import DeviceRecord
+from firebase_push_notification.v1_0.handlers.push_notification_handler import PushNotificationHandler
+
 from .handlers.set_device_info_handler import SetDeviceInfoHandler
-
+from .messages.push_notification import (PushNotification,
+                                         PushNotificationSchema)
+from .models.device_record import DeviceRecord
 
 LOGGER = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ async def firebase_push_notification_handler(profile: Profile, event: EventWithM
             device_token = results.device_token
             # TODO: anticipate collisions
             assert device_token
-        push_notification = PushNotification(
+        push_notification: PushNotification = PushNotification(
             message_id=event.payload.get("message_id"),
             message_tag=event.payload.get("message_tag"),
         )
@@ -156,7 +157,6 @@ async def handle_event(profile: Profile, event: EventWithMetadata):
 async def register_device_token(request: web.BaseRequest):
     device_token=request.match_info["device_token"]
     connection_id = request.match_info["connection_id"]
-
     handler = SetDeviceInfoHandler()
     context: AdminRequestContext = request["context"]
 
@@ -171,9 +171,45 @@ async def register_device_token(request: web.BaseRequest):
     return web.json_response({"device_token": device_info.device_token})
 
 
+@docs(
+    tags=["pushnotification"],
+    summary="Send a push notification",
+)
+@match_info_schema(RegisterDeviceTokenSchema())
+@response_schema(ResponseDeviceInfoSchema(), 200, description="")
+async def push_notification(request: web.BaseRequest):
+    device_token= request.match_info["device_token"]
+    connection_id = request.match_info["connection_id"]
+
+    firebase_server_token = "" # TODO: fix me.
+    
+    handler: PushNotificationHandler = PushNotificationHandler(
+        device_token = device_token
+    )
+
+    context: AdminRequestContext = request["context"]
+    profile = context.profile
+    request_context = RequestContext(profile=profile)
+    request_context.message = PushNotification(
+        message_id="placeholder",
+        recipient_key="placeholder",
+        priority="default",
+    )
+    responder = context.injector.inject(BaseResponder)
+
+    await handler.handle(
+        context=request_context,
+        responder=responder,
+        firebase_server_token=firebase_server_token,
+        device_token=device_token,
+    )
+
+    return web.json_response()
+
 async def register(app: web.Application):
     app.add_routes(
         [
-            web.post("/push-notification/{device_token}/{connection_id}", register_device_token),
+            web.post("/push-notification/register/{device_token}/{connection_id}", register_device_token),
+            web.post("/push-notification/ping/{device_token}/{connection_id}", push_notification),
         ]
     )

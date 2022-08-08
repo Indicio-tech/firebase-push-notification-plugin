@@ -2,16 +2,40 @@ version: "3"
 
 services:
 
+  tunnel-relay:
+    image: dbluhm/agent-tunnel
+    command: -s reverse-proxy:80 -p 4040 -h ${AGENT_TUNNEL_HOST}
+    ports:
+      - 4040:4040
+    depends_on:
+      - reverse-proxy
+  reverse-proxy:
+    image: nginx:alpine
+    restart: unless-stopped
+    environment:
+      AGENT_HTTP: "http://relay:3000"
+      AGENT_WS: "http://relay:3003"
+    ports:
+      - 80:80
+    volumes:
+      - ./mediator.conf.template:/etc/nginx/templates/default.conf.template:z
+    depends_on:
+      - relay
   relay:
     build:
       context: ../
       dockerfile: ./int/Dockerfile
+    volumes:
+      - ./acapy-endpoint.sh:/acapy-endpoint.sh:ro,z
     environment:
       - ACAPY_TOOLBOX_LOG_LEVEL=DEBUG
       - DEVICE_TOKEN=${DEVICE_TOKEN}
       - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
+      - TUNNEL_ENDPOINT=http://tunnel-relay:4040
     ports:
       - "3001:3001"
+    entrypoint: >
+      /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: >
       start --arg-file int-testing-default.yml --webhook-url http://webhook-listener:8080
 
