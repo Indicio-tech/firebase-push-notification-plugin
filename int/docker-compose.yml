@@ -12,7 +12,7 @@ services:
   agent:
     build:
       context: ../
-      dockerfile: ./int/Dockerfile
+      dockerfile: ./int/Dockerfile.int.yml
     environment:
       ACAPY_TOOLBOX_LOG_LEVEL: DEBUG
     ports:
