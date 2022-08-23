@@ -12,8 +12,15 @@ from firebase_push_notification.v1_0.models.device_record import DeviceRecord
 LOGGER = logging.getLogger(__name__)
 
 
+@pytest.mark.parametrize(
+    "topic",
+    [
+        "acapy::outbound_message::undeliverable",
+        "acapy::forward::received",
+    ],
+)
 @pytest.mark.asyncio
-async def test_firebase_push_notification_handler(profile, event_bus: EventBus):
+async def test_firebase_push_notification_handler(topic, profile, event_bus: EventBus):
     # Create device record
     device_record = DeviceRecord(
         device_token=os.getenv("DEVICE_TOKEN"), connection_id="connection-1"
@@ -25,7 +32,6 @@ async def test_firebase_push_notification_handler(profile, event_bus: EventBus):
     assert device_record.device_token != "device_token_placeholder"
 
     # Trigger push notification handler
-    topic = "acapy::outbound_message::undeliverable"
     payload = {
         "connection_id": "connection-1",
         "message_id": "test id",
