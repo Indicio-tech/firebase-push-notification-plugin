@@ -1,4 +1,4 @@
-label: Aries Cloud Agent + Firebase Push Notification
+label: Aries Cloud Agent + Firebase Push Notification + Pickup Plugin
 
 # Admin
 admin: [0.0.0.0, 3001]
@@ -7,6 +7,7 @@ admin-insecure-mode: true
 # Load toolbox plugin
 plugin:
   - firebase_push_notification
+  - acapy-pickup-plugin
 
 plugin-config-value:
   - firebase.server_token=${FIREBASE_SERVER_TOKEN}
@@ -31,3 +32,6 @@ auto-accept-invites: true
 auto-accept-requests: true
 connections-invite: true
 log-level: debug
+
+# Queue
+enable-undelivered-queue: true
