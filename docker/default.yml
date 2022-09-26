@@ -1,4 +1,4 @@
-label: Aries Cloud Agent + QA
+label: Aries Cloud Agent + Firebase Push Notification
 
 # Admin
 admin: [0.0.0.0, 3001]
@@ -8,7 +8,8 @@ admin-insecure-mode: true
 plugin:
   - firebase_push_notification
 
-plugin-config: docker/plugins-config.yml
+plugin-config-value:
+  - firebase.server_token=${FIREBASE_SERVER_TOKEN}
 
 # Transport
 inbound-transport:

@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from aries_cloudagent.core.event_bus import EventBus
 from aries_cloudagent.core.in_memory import InMemoryProfile
@@ -22,9 +23,14 @@ def mock_responder():
 def profile(event_bus, mock_responder):
     """Profile fixture."""
     yield InMemoryProfile.test_profile(
+        settings={
+            "plugin_config": {
+                "firebase": {"server_token": os.getenv("FIREBASE_SERVER_TOKEN")}
+            }
+        },
         bind={
             EventBus: event_bus,
             BaseResponder: mock_responder,
             ProtocolRegistry: ProtocolRegistry(),
-        }
+        },
     )

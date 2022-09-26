@@ -30,14 +30,15 @@ services:
     environment:
       - ACAPY_TOOLBOX_LOG_LEVEL=DEBUG
       - DEVICE_TOKEN=${DEVICE_TOKEN}
-      - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
       - TUNNEL_ENDPOINT=http://tunnel-relay:4040
     ports:
       - "3001:3001"
     entrypoint: >
       /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: >
-      start --arg-file int-testing-default.yml --webhook-url http://webhook-listener:8080
+      start --arg-file int-testing-default.yml
+        --plugin-config-value firebase.server_token=${FIREBASE_SERVER_TOKEN}
+        --webhook-url http://webhook-listener:8080
 
   tunnel-bob:
     image: dbluhm/agent-tunnel

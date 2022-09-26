@@ -90,7 +90,12 @@ async def firebase_push_notification_handler(
 ):
     """Produce firebase events from aca-py events."""
     LOGGER.info("Firebase push notification")
-    firebase_server_token = os.getenv("FIREBASE_SERVER_TOKEN")
+
+    plugin_config = profile.settings["plugin_config"] or {}
+    config = plugin_config["firebase"]
+    env_firebase_server_token = os.getenv("FIREBASE_SERVER_TOKEN")
+    firebase_server_token = config.get("server_token", env_firebase_server_token)
+    assert firebase_server_token
 
     # Retrieve the connection_id of the undeliverable message from the event payload
     connection_id = event.payload.get("connection_id")

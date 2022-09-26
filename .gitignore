@@ -7,7 +7,6 @@ __pycache__/
 *.so
 
 fir-aca-py-firebase-adminsdk-*
-plugins-config.yml
 
 # Distribution / packaging
 .Python

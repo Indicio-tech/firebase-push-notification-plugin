@@ -8,7 +8,8 @@ admin-insecure-mode: true
 plugin:
   - firebase_push_notification
 
-plugin-config: plugins-config.yml
+plugin-config-value:
+  - firebase.server_token=${FIREBASE_SERVER_TOKEN}
 
 # Transport
 inbound-transport:
