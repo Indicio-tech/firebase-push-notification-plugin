@@ -1,4 +1,5 @@
 FROM bcgovimages/von-image:py36-1.16-0 AS base
+RUN pip3 install acapy-pickup-plugin@git+https://github.com/Indicio-tech/acapy-plugin-pickup@main
 
 # Install and Configure Poetry
 USER root

@@ -7,8 +7,10 @@ admin-insecure-mode: true
 # Load toolbox plugin
 plugin:
   - firebase_push_notification
+  - acapy-pickup-plugin
 
-plugin-config: plugins-config.yml
+plugin-config-value:
+  - firebase.server_token=${FIREBASE_SERVER_TOKEN}
 
 # Transport
 inbound-transport:

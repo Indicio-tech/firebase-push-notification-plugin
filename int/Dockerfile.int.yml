@@ -15,9 +15,7 @@ ENV PATH="/home/indy/.venv/bin:$PATH"
 RUN mkdir firebase_push_notification && touch firebase_push_notification/__init__.py
 COPY --chown=indy:indy pyproject.toml poetry.lock ./
 COPY int/docker/int-testing-default.yml ./
-COPY int/docker/plugins-config.yml ./
 COPY firebase_push_notification firebase_push_notification
-COPY int/.env ./
 RUN poetry install --no-dev
 ENTRYPOINT ["/bin/bash", "-c", "aca-py \"$@\"", "--"]
 CMD ["start", "--arg-file", "int-testing-default.yml"]

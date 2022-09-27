@@ -150,10 +150,12 @@ def event_bus():
     """Event bus fixture."""
     yield EventBus()
 
+
 @pytest.fixture
 def mock_responder():
     """Mock responder fixture."""
     yield MockResponder()
+
 
 @pytest.fixture
 def profile(event_bus, mock_responder):

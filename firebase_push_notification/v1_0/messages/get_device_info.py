@@ -14,6 +14,7 @@ class GetDeviceInfo(AgentMessage):
     class Meta:
 
         """Metadata for get device info."""
+
         handler_class = HANDLER_CLASS
         message_type = GET_DEVICE_INFO
         schema_class = "GetDeviceInfoSchema"

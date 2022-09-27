@@ -24,49 +24,64 @@ services:
   relay:
     build:
       context: ../
-      dockerfile: ./int/Dockerfile
+      dockerfile: ./int/Dockerfile.int.yml
     volumes:
       - ./acapy-endpoint.sh:/acapy-endpoint.sh:ro,z
     environment:
       - ACAPY_TOOLBOX_LOG_LEVEL=DEBUG
       - DEVICE_TOKEN=${DEVICE_TOKEN}
-      - FIREBASE_SERVER_TOKEN=${FIREBASE_SERVER_TOKEN}
       - TUNNEL_ENDPOINT=http://tunnel-relay:4040
     ports:
       - "3001:3001"
     entrypoint: >
       /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: >
-      start --arg-file int-testing-default.yml --webhook-url http://webhook-listener:8080
+      start --arg-file int-testing-default.yml
+        --plugin-config-value firebase.server_token=${FIREBASE_SERVER_TOKEN}
+        --webhook-url http://webhook-listener:8080
 
+  tunnel-bob:
+    image: dbluhm/agent-tunnel
+    command: -s agent-bob:3002 -p 4041 -h ${AGENT_TUNNEL_HOST}
   agent-bob:
     image: acapy-toolbox
     build:
       context: ../
-      dockerfile: ./demo/Dockerfile
+      dockerfile: ./demo/Dockerfile.demo.yml
     volumes:
+      - ./acapy-endpoint.sh:/acapy-endpoint.sh:ro,z
       - ./configs:/home/indy/configs:ro,z
     environment:
+      TUNNEL_ENDPOINT: http://tunnel-bob:4041
       # Modify for more log output
       ACAPY_TOOLBOX_LOG_LEVEL: WARNING
     ports:
       - "3006:3006"
       - "3002:3002"
+    entrypoint: >
+      /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: start --arg-file ./configs/bob.yml --webhook-url http://webhook-listener:8080
 
+  tunnel-alice:
+    image: dbluhm/agent-tunnel
+    command: -s agent-alice:4002 -p 4042 -h ${AGENT_TUNNEL_HOST}
   agent-alice:
     image: acapy-toolbox
     build:
       context: ../
-      dockerfile: ./demo/Dockerfile
+      dockerfile: ./demo/Dockerfile.demo.yml
     volumes:
+      - ./acapy-endpoint.sh:/acapy-endpoint.sh:ro,z
       - ./configs:/home/indy/configs:ro,z
     environment:
+      TUNNEL_ENDPOINT: http://tunnel-alice:4042
       # Modify for more log output
       ACAPY_TOOLBOX_LOG_LEVEL: WARNING
     ports:
       - "3007:3007"
       - "4002:4002"
+    entrypoint: >
+      /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: start --arg-file ./configs/alice.yml --webhook-url http://webhook-listener:8080
 
   webhook-listener:
