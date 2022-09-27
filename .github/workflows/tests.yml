@@ -48,7 +48,7 @@ jobs:
           poetry install
     - name: Run unit tests with pytest
       run: |
-        poetry run pytest tests
+        FIREBASE_SERVER_TOKEN="test_firebase_server_token" DEVICE_TOKEN="test_device_token" poetry run pytest tests
 
   int:
     name: Integration Tests
