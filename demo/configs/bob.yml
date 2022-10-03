@@ -30,8 +30,7 @@ debug-presentations: true
 auto-accept-invites: true
 auto-accept-requests: true
 auto-ping-connection: true
-invite: true
-invite-metadata-json: '{"group": "admin"}'
+connections-invite: true
 
 # Credentials and Presentations
 preserve-exchange-records: true
