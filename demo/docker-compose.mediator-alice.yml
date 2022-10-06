@@ -2,7 +2,7 @@ version: "3"
 
 services:
 
-  tunnel-relay:
+  tunnel-mediator:
     image: dbluhm/agent-tunnel
     command: -s reverse-proxy:80 -p 4040 -h ${AGENT_TUNNEL_HOST}
     ports:
@@ -13,15 +13,15 @@ services:
     image: nginx:alpine
     restart: unless-stopped
     environment:
-      AGENT_HTTP: "http://relay:3000"
-      AGENT_WS: "http://relay:3003"
+      AGENT_HTTP: "http://mediator:3000"
+      AGENT_WS: "http://mediator:3003"
     ports:
       - 80:80
     volumes:
       - ./mediator.conf.template:/etc/nginx/templates/default.conf.template:z
     depends_on:
-      - relay
-  relay:
+      - mediator
+  mediator:
     build:
       context: ../
       dockerfile: ./int/Dockerfile.int.yml
@@ -30,7 +30,7 @@ services:
     environment:
       - ACAPY_TOOLBOX_LOG_LEVEL=DEBUG
       - DEVICE_TOKEN=${DEVICE_TOKEN}
-      - TUNNEL_ENDPOINT=http://tunnel-relay:4040
+      - TUNNEL_ENDPOINT=http://tunnel-mediator:4040
     ports:
       - "3001:3001"
     entrypoint: >
