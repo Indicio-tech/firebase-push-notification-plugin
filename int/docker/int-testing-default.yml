@@ -35,6 +35,3 @@ log-level: debug
 
 # Mediation
 open-mediation: true
-
-# Queue
-enable-undelivered-queue: true

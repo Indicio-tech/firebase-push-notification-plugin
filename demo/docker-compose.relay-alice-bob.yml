@@ -38,29 +38,13 @@ services:
     command: >
       start --arg-file int-testing-default.yml
         --plugin-config-value firebase.server_token=${FIREBASE_SERVER_TOKEN}
+        --plugin-config-value pickup.persistence=redis
+        --plugin-config-value pickup.redis.ttl_hours=168
+        --plugin-config-value pickup.redis.server=redis://redis:6379/0
         --webhook-url http://webhook-listener:8080
-
-  tunnel-bob:
-    image: dbluhm/agent-tunnel
-    command: -s agent-bob:3002 -p 4041 -h ${AGENT_TUNNEL_HOST}
-  agent-bob:
-    image: acapy-toolbox
-    build:
-      context: ../
-      dockerfile: ./demo/Dockerfile.demo.yml
-    volumes:
-      - ./acapy-endpoint.sh:/acapy-endpoint.sh:ro,z
-      - ./configs:/home/indy/configs:ro,z
-    environment:
-      TUNNEL_ENDPOINT: http://tunnel-bob:4041
-      # Modify for more log output
-      ACAPY_TOOLBOX_LOG_LEVEL: WARNING
-    ports:
-      - "3006:3006"
-      - "3002:3002"
-    entrypoint: >
-      /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
-    command: start --arg-file ./configs/bob.yml --webhook-url http://webhook-listener:8080
+    depends_on:
+      redis:
+        condition: service_healthy
 
   tunnel-alice:
     image: dbluhm/agent-tunnel
@@ -84,6 +68,21 @@ services:
       /bin/sh -c '/acapy-endpoint.sh aca-py "$$@"' --
     command: start --arg-file ./configs/alice.yml --webhook-url http://webhook-listener:8080
 
+  redis:
+      image: "redis:alpine"
+      ports:
+      - "6379:6379"
+      volumes:
+        - ./redis-data:/var/lib/redis
+        - ./redis.conf:/etc/redis/redis.conf
+      environment:
+      - REDIS_REPLICATION_MODE=master
+      healthcheck:
+        test: nc -z localhost 6379 || exit -1
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 10s
   webhook-listener:
     image: mendhak/http-https-echo:18
     environment:

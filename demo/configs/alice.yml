@@ -3,10 +3,8 @@ invite-label: Alice (Admin)
 
 endpoint:
   - http://agent-alice:4002
-  - ws://agent-alice:4005
 inbound-transport:
   - [http, 0.0.0.0, 4002]
-  - [ws, 0.0.0.0, 4005]
 admin: [0.0.0.0, 3007]
 
 # Load toolbox plugin
@@ -49,10 +47,6 @@ tails-server-base-url: http://tails-server:6543
 # wallet-type: indy
 # wallet-key: "insecure, for use in demo only"
 # auto-provision: true
-
-# Enable undelivered queue
-# Important for communication with toolbox over http (as opposed to ws)
-enable-undelivered-queue: true
 
 # Catch Admin Trust Pings
 monitor-ping: true

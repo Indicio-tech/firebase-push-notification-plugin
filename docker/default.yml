@@ -32,6 +32,3 @@ auto-accept-invites: true
 auto-accept-requests: true
 connections-invite: true
 log-level: debug
-
-# Queue
-enable-undelivered-queue: true

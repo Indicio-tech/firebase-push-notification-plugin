@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+from typing import cast
 
 import requests
 from aiohttp import web
@@ -11,6 +12,7 @@ from aries_cloudagent.core.event_bus import EventBus, EventWithMetadata
 from aries_cloudagent.core.profile import Profile
 from aries_cloudagent.messaging.models.openapi import OpenAPISchema
 from aries_cloudagent.messaging.valid import UUIDFour
+from aries_cloudagent.transport.outbound.message import OutboundMessage
 from marshmallow import fields
 
 from .handlers.set_device_info_handler import SetDeviceInfoHandler
@@ -41,15 +43,13 @@ class ResponseDeviceInfoSchema(OpenAPISchema):
     )
 
 
-UNDELIVERABLE_RE = re.compile(r"acapy::outbound_message::undeliverable")
-FORWARD_RE = re.compile(r"acapy::forward::received")
+UNDELIVERABLE_RE = re.compile(r"acapy::outbound-message::undeliverable")
 
 
 def register_events(event_bus: EventBus):
     """Register to handle events."""
     LOGGER.info("Firebase, subscribe to all events!")
     event_bus.subscribe(UNDELIVERABLE_RE, firebase_push_notification_handler)
-    event_bus.subscribe(FORWARD_RE, firebase_push_notification_handler)
 
 
 def push_notifications(event, firebase_server_token, device_token):
@@ -57,8 +57,8 @@ def push_notifications(event, firebase_server_token, device_token):
     assert firebase_server_token
     assert device_token
     push_notification: PushNotification = PushNotification(
-        message_id=event.payload.get("message_id"),
-        message_tag=event.payload.get("message_tag"),
+        message_id="placeholder_msg_id",
+        message_tag="placeholder_msg_tag",
     )
     headers = {
         "Content-Type": "application/json",
@@ -98,7 +98,9 @@ async def firebase_push_notification_handler(
     assert firebase_server_token
 
     # Retrieve the connection_id of the undeliverable message from the event payload
-    connection_id = event.payload.get("connection_id")
+    outbound = cast(OutboundMessage, event.payload)
+    connection_id = outbound.connection_id
+    # TODO: look up connection id based on reply to verkey
     LOGGER.info(f"Connection_id: {connection_id}")
 
     # Use the connection_id to query the device records
