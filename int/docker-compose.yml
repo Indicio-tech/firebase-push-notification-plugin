@@ -12,13 +12,16 @@ services:
   agent:
     build:
       context: ../
-      dockerfile: ./int/Dockerfile
+      dockerfile: ./int/Dockerfile.int.yml
     environment:
       ACAPY_TOOLBOX_LOG_LEVEL: DEBUG
     ports:
       - "3001:3001"
     command: >
       start --arg-file int-testing-default.yml
+      --plugin-config-value pickup.persistence=redis
+      --plugin-config-value pickup.redis.ttl_hours=168
+      --plugin-config-value pickup.redis.server=redis://redis:6379/0
 
 
   echo:

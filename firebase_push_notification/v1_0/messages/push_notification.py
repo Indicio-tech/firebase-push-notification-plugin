@@ -6,7 +6,6 @@ from aries_cloudagent.messaging.agent_message import AgentMessage, AgentMessageS
 
 
 class PushNotification(AgentMessage):
-
     class Meta:
         """Metadata for push notifications"""
 

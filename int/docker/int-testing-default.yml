@@ -1,4 +1,4 @@
-label: Relay
+label: Mediator
 
 # Admin
 admin: [0.0.0.0, 3001]
@@ -7,8 +7,10 @@ admin-insecure-mode: true
 # Load toolbox plugin
 plugin:
   - firebase_push_notification
+  - acapy_plugin_pickup
 
-plugin-config: plugins-config.yml
+plugin-config-value:
+  - firebase.server_token=${FIREBASE_SERVER_TOKEN}
 
 # Transport
 inbound-transport:
@@ -16,8 +18,8 @@ inbound-transport:
   - [ws, 0.0.0.0, 3003]
 outbound-transport: http
 endpoint:
-  - http://relay:3000
-  - ws://relay:3003
+  - http://mediator:3000
+  - ws://mediator:3003
 
 # Ledger
 no-ledger: true
@@ -33,6 +35,3 @@ log-level: debug
 
 # Mediation
 open-mediation: true
-
-# Queue
-enable-undelivered-queue: true
