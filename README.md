@@ -5,21 +5,23 @@ The Firebase Push Notification Plugin allows push notifications to be sent to mo
 
 This project is inspired by [Aries RFC 0734: Push Notifications fcm Protocol 1.0](https://github.com/blu3beri/aries-rfcs/tree/feat/push-notifications-android/features/0734-push-notifications-fcm) from Timo Glastra & Berend Sliedrecht (Animo Solutions).
 
+The push notification plugin functions in conjunction with the [pickup plugin](https://github.com/Indicio-tech/acapy-plugin-pickup), which allows an agent to pick up messages held by a mediator.
+
 ## Development/Manual Setup
 
-1. Clone this repository using `git clone https://github.com/Indicio-tech/firebase-push-notification-plugin.git`
+1. Clone this repository
 
 2. Create your Firebase Console by clicking **Add Project** on [this page](https://console.firebase.google.com/)
 
 3. Download mobile app
 
-4. Copy firebase server token and device token into this repository as environment variables and configs
+4. Copy your firebase server token and your device token into your local copy of this repository as environment variables
 
-    a. Find the server token on the Firebase Console under Settings > Project Settings > Cloud Messaging > Cloud Messaging API > Server key. Paste the server token into your local copy of the plugin repository in an `.env` file as the `FIREBASE_SERVER_TOKEN` environment variable.
+    a. Create a `.env` file in the `demo/` folder
 
-    b. Find the `device_token` in the mobile app and paste it into your local copy of the plugin repository in an `.env` file as the `DEVICE_TOKEN` environment variable.
+    b. Find the server token on the Firebase Console under Settings > Project Settings > Cloud Messaging > Cloud Messaging API > Server key. Paste this value into `.env` file as the `FIREBASE_SERVER_TOKEN` environment variable
 
-    c. Make a copy of `plugins-config-example.yml` and paste these tokens in place of the example values. Ensure that your version control system does not track these files so that these secret tokens are not revealed publicly.
+    c. Find the `device_token` in the mobile app and paste it into the `.env` file as the `DEVICE_TOKEN` environment variable
 
 .env:
 ```
@@ -28,43 +30,21 @@ FIREBASE_SERVER_TOKEN="AAAA9g..."
 ```
 
 
-plugins-config.yml:
-```
-firebase_plugin:
-  firebase_server_token: "AAAA9g..."
-  device_token: "cYHSGX..."
-```
-
-Note: In the future, it will be required to use the `set-device-info` message to register the `device_token`.
-
-5. To send a push notification to the registered device, run the following in the command line:
-
-```
-poetry install
-poetry shell
-aca-py start --arg-file ./docker/default.yml
-```
-
 
 ## Overview
 * Alice: message sender
-* Bob: message receiver (has a mobile app that allows him to receive push notifications)
-* Relay (this repository): an ACA-Py plugin that extends mediator functionality to include a `device_token` registry. The message receiver's mediator is loaded with this relay so that it can forward undelivered messages to firebase. Henceforth, this plugin will be referred to as the notification relay, or relay.
-* Mediator: the mediator for Bob
+* Bob: message receiver (has a mobile app that allows for receiving push notifications)
+* Mediator: an ACA-Py plugin that extends mediator functionality to include a `device_token` registry. The mediator is loaded with the relay and pickup plugin and belongs to the message receiver so that it can forward undelivered messages to firebase
+  * Relay: a service that forwards messages
+  * Pickup: a plugin that helps an agent pick up messages held by a mediator
 * [Firebase Console](https://console.firebase.google.com/): Google platform with feature for sending push notifications
-* Mobile app: Bob's app that allows him to receive push notifications
-
-
-![Getting Started](./images/entities.png)
 
 
 After Bob has established a connection with his mediator and requested mediation, he can then register his device for any messages that arrive at the mediator for his connection. If Bob's device is offline, then the mediator loaded with the relay will send a push notification for the message.
 
 To register his device, Bob sends the `set-device-info` message to his mediator loaded with the relay. The relay stores the `device_token` with the `connection_id` corresponding to Bob's connection to his mediator. Bob receives the `device-info` message in acknowledgement.
 
-When Bob's mediator receives a message from Alice but Bob's device is unavailable, the message is stored in the mediator's undelivered queue. The undeliverable message event is raised, triggering the push notification to be sent via the relay. When Bob's device comes back online, the pickup plugin triggers the undelivered messages to be sent to Bob's device.
-
-
+When Bob's mediator receives a message from Alice but Bob's device is unavailable, the undeliverable message event is raised, triggering the push notification to be sent via the relay. The pickup plugin triggers the undelivered messages to be sent to Bob's device.
 
 
 ## Name and Version
@@ -147,15 +127,15 @@ The push notification is an unencrypted data payload sent to the firebase consol
 
 
 1. Alice sends a message to Bob's mediator using the public keys Bob has registered with his mediator
-2. Bob's mediator attempts to deliver message referring to registered keys
-3. Bob's mediator queues message on failed delivery
-4. Bob's mediator raises undeliverable message event on event bus with `message_id` and `message_tag`
+2. The mediator attempts to deliver message referring to registered keys
+3. The undeliverable message event is raised
+4. The pickup plugin queues the message on failed delivery
 5. Relay looks up `device_token` from `connection_id` on undeliverable event
 6. Relay notifies Firebase Console
-7. Bob's mobile app retrieves `PushNotification` from Firebase Console with `message_id`
+7. Bob's mobile app retrieves `PushNotification` from Firebase Console
 8. When Bob's device is back online, the pickup protocol flow begins to allow the mobile app to receive all messages queued in the mediator
 
-![Text](./images/push-notification-diagram.svg)
+![Text](./images/demo%20flow.png)
 
 ### Future Work
 * Enable dynamic registration
